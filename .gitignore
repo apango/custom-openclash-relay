@@ -1,0 +1,21 @@
+# 敏感配置 - 本地使用，不上传
+overlay.yaml
+overlay-*.yaml
+*-secret.yaml
+*.local.yaml
+
+# 临时文件
+*.tmp
+*.bak
+upstream.ini
+rules_from_upstream.txt
+groups_from_upstream.txt
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
