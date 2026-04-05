@@ -19,3 +19,4 @@ groups_from_upstream.txt
 .idea/
 *.swp
 *.swo
+relay.yaml
