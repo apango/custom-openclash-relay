@@ -6,6 +6,10 @@ on:
   workflow_dispatch:
   push:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
