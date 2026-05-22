@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 """同步上游 Custom_Clash.ini 并生成自定义配置"""
-from datetime import datetime
-
-timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
 
 # 读取上游规则
 with open('rules_from_upstream.txt', 'r', encoding='utf-8-sig') as f:
@@ -71,7 +68,7 @@ content = f'''; ============================================================
 ; 流量路径: 用户 → 🔗 链式出口(dialer-proxy) → 🔗 链式上游 → 目标网站
 ; 网站看到: 美国私宅 IP
 ; 上游: https://github.com/Aethersailor/Custom_OpenClash_Rules
-; 自动同步于: {timestamp}
+; 自动同步: GitHub Actions
 ;
 ; 使用说明:
 ; 1. 在 OpenClash 订阅配置中使用此 ini 作为订阅模板
