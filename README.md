@@ -4,8 +4,8 @@
 
 ## 功能特点
 
-- 所有海外流量通过**链式代理**转发
-- 流量路径：设备 → 机场节点 → 私宅IP（最终出口）
+- 所有海外流量可优先选择**链式出口**转发
+- 流量路径：OpenWrt 设备 → 机场节点（链式上游）→ 私宅 IP（链式出口）→ 目标网站
 - 自动同步上游规则更新
 - 私宅代理凭证仅本地存储，不上传
 
@@ -18,51 +18,61 @@
 ├── .github/
 │   └── workflows/
 │       └── sync.yml              # 自动同步上游
-├── overlay-example.yaml          # 覆写配置示例（本地使用）
+├── relay.yaml                    # 本地真实覆写配置（不上传）
+├── overlay-example.yaml          # 覆写配置示例（不上传）
 └── README.md
 ```
 
 ## 使用方法
 
-### 1. 创建 GitHub 仓库
+### 1. 在线订阅模板
 
-将此仓库内容上传到你的 GitHub 仓库。
-
-### 2. 获取 Raw URL
-
-仓库上传后，访问：
+OpenClash 的订阅模板 URL 使用：
 ```
-https://raw.githubusercontent.com/你的用户名/你的仓库名/main/cfg/Custom_Clash_Relay.ini
+https://raw.githubusercontent.com/apango/custom-openclash-relay/main/cfg/Custom_Clash_Relay.ini
 ```
 
-### 3. 配置 OpenClash
+### 2. 配置 OpenClash
 
 在 OpenClash「订阅管理」中添加：
 
 | 配置项 | 值 |
 |--------|-----|
-| 订阅模板 URL | 上一步的 Raw URL |
-| 覆写配置 | 见下方「覆写配置」 |
+| 订阅模板 URL | 上面的 Raw URL |
+| 覆写配置 | 使用本地 `relay.yaml` 内容 |
 
-### 4. 覆写配置（本地）
+### 3. 覆写配置（本地）
 
-在 OpenClash 的「覆写配置」中填入你的私宅代理信息：
+在线模板只提供代理组和规则，不包含私宅代理凭证。将本地 `relay.yaml` 的内容粘贴到 OpenClash「覆写配置」中，结构如下：
 
 ```yaml
 proxies:
-  - name: 🏠 私宅代理
-    type: ss
-    server: 你的私宅IP
-    port: 你的端口
-    cipher: aes-256-gcm
-    password: 你的密码
+  - name: 美国私宅
+    type: socks5
+    server: YOUR_SERVER_IP
+    port: YOUR_PORT
+    username: YOUR_USERNAME
+    password: YOUR_PASSWORD
     udp: true
+    dialer-proxy: 🔗 链式上游
 
 proxy-groups:
-  - name: 🏠 私宅代理
+  - name: 🔗 链式出口
     type: select
     proxies:
-      - 🏠 私宅代理
+      - 美国私宅
+
+  - name: 🔗 链式上游
+    type: select
+    proxies:
+      - ♻️ 自动选择
+      - 🇭🇰 香港节点
+      - 🇺🇸 美国节点
+      - 🇯🇵 日本节点
+      - 🇸🇬 新加坡节点
+      - 🇼🇸 台湾节点
+      - 🇰🇷 韩国节点
+      - 🎯 全球直连
 ```
 
 ## 自动同步
@@ -72,13 +82,13 @@ proxy-groups:
 ## 流量走向
 
 ```
-你的设备
+OpenWrt 设备
     │
     ▼
-┌─────────────┐     ┌─────────────┐
-│  机场节点     │ ──▶ │  私宅IP      │
-│ (入口/跳板)   │     │ (最终出口IP) │
-└─────────────┘     └─────────────┘
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  OpenClash  │ ──▶ │  机场节点     │ ──▶ │  私宅 IP     │ ──▶ 目标网站
+│  规则分流     │     │ (链式上游)   │     │ (链式出口)   │
+└─────────────┘     └─────────────┘     └─────────────┘
 ```
 
 ## 安全说明
@@ -86,3 +96,4 @@ proxy-groups:
 - 私宅代理凭证**仅保存在本地** OpenClash 配置中
 - GitHub 仓库中**不包含任何敏感信息**
 - 覆写配置不对外曝光
+- 不要提交 `relay.yaml`、`overlay-*.yaml` 或任何包含真实账号密码的文件

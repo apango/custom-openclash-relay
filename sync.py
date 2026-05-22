@@ -5,14 +5,65 @@ from datetime import datetime
 timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
 
 # 读取上游规则
-with open('rules_from_upstream.txt', 'r') as f:
+with open('rules_from_upstream.txt', 'r', encoding='utf-8-sig') as f:
     rules = f.read()
 
 # 替换规则中的 节点选择 为 手动选择
 rules = rules.replace('🚀 节点选择', '🚀 手动选择')
 
-with open('groups_from_upstream.txt', 'r') as f:
+with open('groups_from_upstream.txt', 'r', encoding='utf-8-sig') as f:
     groups = f.read()
+
+local_group_names = {
+    '🚀 手动选择',
+    '🚀 节点选择',
+    '🔗 链式上游',
+    '🔗 链式出口',
+    '🔗 链式代理',
+    '🏠 私宅代理',
+    '✈️ 机场节点',
+    '♻️ 自动选择',
+    '💬 即时通讯',
+    '🌐 社交媒体',
+    '🚀 GitHub',
+    '🤖 ChatGPT',
+    '🤖 AI服务',
+    '🎶 TikTok',
+    '📹 YouTube',
+    '🎥 Netflix',
+    '🎥 DisneyPlus',
+    '🎥 HBO',
+    '🎥 PrimeVideo',
+    '🎥 AppleTV+',
+    '🎥 Emby',
+    '🎻 Spotify',
+    '📺 Bahamut',
+    '🌎 国外媒体',
+    '🛒 国外电商',
+    '📢 谷歌FCM',
+    '🇬 谷歌服务',
+    '🍎 苹果服务',
+    'Ⓜ️ 微软服务',
+    '🎮 游戏平台',
+    '🎮 Steam',
+    '🚀 测速工具',
+    '🐟 漏网之鱼',
+    '🔀 非标端口',
+}
+
+
+def group_name(line):
+    if not line.startswith('custom_proxy_group='):
+        return ''
+    return line.split('=', 1)[1].split('`', 1)[0]
+
+
+groups = '\n'.join(
+    line for line in groups.splitlines()
+    if group_name(line) not in local_group_names
+)
+if groups:
+    groups += '\n'
 
 # 生成新的 INI
 content = f'''; ============================================================
@@ -37,7 +88,7 @@ content = f'''; ============================================================
 ; 【核心】🚀 手动选择 - 主选择入口（包含美国私宅）
 custom_proxy_group=🚀 手动选择`select`[]🔗 链式出口`[]♻️ 自动选择`[]🇭🇰 香港节点`[]🇺🇸 美国节点`[]🇯🇵 日本节点`[]🇸🇬 新加坡节点`[]🇼🇸 台湾节点`[]🇰🇷 韩国节点`[]🎯 全球直连
 
-; 🔗 链式上游 - 台湾私宅通过此组中转（选择具体机场节点或直连）
+; 🔗 链式上游 - 美国私宅通过此组中转（选择具体机场节点或直连）
 custom_proxy_group=🔗 链式上游`select`[]♻️ 自动选择`[]🇭🇰 香港节点`[]🇺🇸 美国节点`[]🇯🇵 日本节点`[]🇸🇬 新加坡节点`[]🇼🇸 台湾节点`[]🇰🇷 韩国节点`[]🎯 全球直连
 
 ; 🔗 链式出口 占位组（实际代理定义通过本地覆写配置注入，此处仅防止订阅报错）
@@ -82,7 +133,7 @@ enable_rule_generator=true
 overwrite_original_rules=true
 '''
 
-with open('cfg/Custom_Clash_Relay.ini', 'w') as f:
+with open('cfg/Custom_Clash_Relay.ini', 'w', encoding='utf-8') as f:
     f.write(content)
 
 print("INI 文件已生成")
