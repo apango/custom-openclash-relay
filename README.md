@@ -47,7 +47,7 @@ https://raw.githubusercontent.com/apango/custom-openclash-relay/main/cfg/Custom_
 
 ```yaml
 proxies:
-  - name: 美国私宅
+  - name: 链式美国私宅
     type: socks5
     server: YOUR_SERVER_IP
     port: YOUR_PORT
@@ -60,20 +60,13 @@ proxy-groups:
   - name: 🔗 链式出口
     type: select
     proxies:
-      - 美国私宅
+      - 链式美国私宅
 
-  - name: 🔗 链式上游
-    type: select
-    proxies:
-      - ♻️ 自动选择
-      - 🇭🇰 香港节点
-      - 🇺🇸 美国节点
-      - 🇯🇵 日本节点
-      - 🇸🇬 新加坡节点
-      - 🇼🇸 台湾节点
-      - 🇰🇷 韩国节点
-      - 🎯 全球直连
 ```
+
+`🔗 链式上游` 由在线模板生成，可以使用 `♻️ 自动选择` 自动挑选机场前置节点。`♻️ 自动选择` 只排除名称包含“链式”的节点；家宽、住宅、私宅字样的机场节点仍会参与自动测速。
+
+`🚀 手动选择` 是总入口，可选 `🔗 链式出口`、`♻️ 自动选择`、各地区自动优选组，也可以直接手动选择订阅里的具体机场节点。各地区组如 `🇭🇰 香港节点`、`🇺🇸 美国节点` 会在对应地区节点范围内自动测速优选。
 
 ## 自动同步
 
